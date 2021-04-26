@@ -1,0 +1,22 @@
+<html lang="{{ lang }}" >
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/sc-table.css') }}">
+
+    {% for text in table_txt %}
+
+    <table class="tablefont" summary="{{ text['summary'] }}">
+        
+        <tr>
+            <th colspan="{{ text['column_span']}}">Table Title by lang</th>
+        </tr>
+        <tr>
+            {% for column in text['column_headers'] %}
+            <th>{{ column }}</th>
+            {% endfor %}
+        </tr>
+        
+        <tr></tr>
+    </table>
+   
+    {% endfor %}
+    
+</html>
