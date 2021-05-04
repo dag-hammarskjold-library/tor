@@ -1,5 +1,5 @@
 from flask import Flask, render_template
-from tor.db import get_coll_names, get_table_info
+from tor.db import get_coll_names, get_table_info, get_ga_regular
 app = Flask(__name__)
 
 @app.route('/')
@@ -28,7 +28,9 @@ def ga_emergency(lang):
 @app.route('/<string:lang>/ga/regular/<int:session>')
 def ga_regular(lang, session):
     table_txt = get_table_info(lang, "GA", "Regular Sessions")
-    return render_template('/ga/regular.html', lang=lang, session=session, table_txt=table_txt)
+    table_records = get_ga_regular(lang, session)
+    
+    return render_template('/ga/regular.html', lang=lang, session=session, table_txt=table_txt, records=table_records)
 
 #Route for SC Veteos by language
 @app.route('/<string:lang>/sc/veteos')

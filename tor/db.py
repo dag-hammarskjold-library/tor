@@ -67,3 +67,63 @@ def get_table_info(lang, body, template):
 
     except Exception as e:
         return e
+
+def get_ga_regular(lang, session):
+    """ 
+    Get the GA Regular Session table info by language and session
+    """
+    pipeline = []
+
+    match_stage = {
+        '$match': {
+            'template': 'Regular Sessions', 
+            'session': str(session)
+        }
+    } 
+
+    transform = {}
+    transform['_id'] = 0
+
+    transform['res_doc'] = '$resolution.doc_symbol'
+    transform['res_url'] = '$resolution.url_suffix'
+    transform['plen_ctte'] = 1
+    transform['agenda'] = 1
+    transform['meet_doc'] = '$meeting.doc_symbol'
+    transform['meet_url'] = '$meeting.url_suffix'
+    transform['date'] = '$date.' + lang 
+    
+
+    if lang == 'es':
+        press_lang = 'en'
+    else:
+        press_lang = lang
+
+    transform['press_yr'] = '$press.year'
+    transform['press_release'] = '$press.release.' + press_lang 
+    transform['press_url'] =  {
+        '$let': {
+            'vars': {
+                'release': {'$split': ['$press.release.' + press_lang, '/']}}, 
+            'in': {
+                '$concat': [
+                    {'$toLower': {'$arrayElemAt': ['$$release', 0]}}, 
+                    {'$arrayElemAt': ['$$release', 1]}
+                ]
+            }
+        }
+    } 
+    transform['vote'] = '$vote.' + lang 
+    transform['draft'] = '$draft'
+    transform['topic'] = '$topic.' + lang
+
+    transform_stage = {}
+    transform_stage['$project'] = transform
+
+    pipeline.append(match_stage)
+    pipeline.append(transform_stage)
+
+    try:
+        return list(db.records.aggregate(pipeline))
+
+    except Exception as e:
+        return e
