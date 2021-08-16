@@ -1,5 +1,5 @@
 from flask import Flask, render_template
-from tor.db import get_coll_names, get_table_info, get_ga_regular
+from tor.db import get_table_info, get_ga_regular, get_sc_veto
 app = Flask(__name__)
 
 @app.route('/')
@@ -33,10 +33,12 @@ def ga_regular(lang, session):
     return render_template('/ga/regular.html', lang=lang, session=session, table_txt=table_txt, records=table_records)
 
 #Route for SC Veteos by language
-@app.route('/<string:lang>/sc/veteos')
-def sc_vetoes(lang, session):
+@app.route('/<string:lang>/sc/veto')
+def sc_vetoes(lang):
     table_txt = get_table_info(lang, "SC", "Vetoes")
-    return 'Route for SC Veteos by language'
+    table_records = get_sc_veto(lang)
+    #return 'Route for SC vetoes'
+    return render_template('/sc/veto.html', lang=lang, table_txt=table_txt, records=table_records)
 
 #Route for SC Meetings & Outcomes by language and year
 @app.route('/<string:lang>/sc/meetings/<int:year>')

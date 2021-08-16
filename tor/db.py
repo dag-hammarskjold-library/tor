@@ -54,6 +54,9 @@ def get_table_info(lang, body, template):
     transform['sequence'] = '$sequence.' + lang
     transform['links_txt'] = '$links_txt.' + lang
     transform['column_headers'] = '$column_headers.' + lang
+    transform['table_title'] = '$table_title.' + lang
+    transform['table_note'] = '$table_note.' + lang
+    transform['sequence'] = '$sequence.' + lang
 
     transform_stage = {}
     transform_stage['$project'] = transform
@@ -115,6 +118,39 @@ def get_ga_regular(lang, session):
     transform['vote'] = '$vote.' + lang 
     transform['draft'] = '$draft'
     transform['topic'] = '$topic.' + lang
+
+    transform_stage = {}
+    transform_stage['$project'] = transform
+
+    pipeline.append(match_stage)
+    pipeline.append(transform_stage)
+
+    try:
+        return list(db.records.aggregate(pipeline))
+
+    except Exception as e:
+        return e
+
+def get_sc_veto(lang):
+    """ 
+    Get the SC Veto table info by language
+    """
+    pipeline = []
+
+    match_stage = {
+        '$match': {
+            'template': 'Vetoes', 
+        }
+    } 
+
+    transform = {}
+    transform['_id'] = 0
+
+    transform['date'] = '$date.' + lang 
+    transform['draft'] = 1
+    transform['written_record'] = 1 
+    transform['agenda_item'] = '$agenda_item.' + lang 
+    transform['pm_negative_vote'] = '$pm_negative_vote.' + lang 
 
     transform_stage = {}
     transform_stage['$project'] = transform
