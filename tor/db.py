@@ -163,3 +163,38 @@ def get_sc_veto(lang):
 
     except Exception as e:
         return e
+
+def preview_sc_veto_record(row_num):
+    """ 
+    Return 1 SC Veto record for all languages
+    """
+
+    try:
+       
+        row = db.records.find_one({'template': 'Vetoes', 'row_num': row_num} )
+
+        preview_records = []
+
+        if row == None:
+            return preview_records
+        else:
+
+            langs = ['en', 'fr', 'es']
+            preview = {}
+            
+
+            for lang in langs:
+                preview['lang'] = lang
+                preview['date'] = row['date'][lang]
+                preview['draft'] = row['draft']
+                preview['written_record'] = row['written_record'] 
+                preview['agenda_item'] = row['agenda_item'][lang]
+                preview['pm_negative_vote'] = row['pm_negative_vote'][lang] 
+
+                preview_records.append(preview)
+                preview = {}
+
+            return preview_records
+
+    except Exception as e:
+        return e

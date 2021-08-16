@@ -1,5 +1,5 @@
 from flask import Flask, render_template
-from tor.db import get_table_info, get_ga_regular, get_sc_veto
+from tor.db import get_table_info, get_ga_regular, get_sc_veto, preview_sc_veto_record
 app = Flask(__name__)
 
 @app.route('/')
@@ -53,3 +53,11 @@ def page_not_found(error):
 @app.errorhandler(505)
 def page_not_found(error):
     return render_template('error.html'), 505 
+
+##################CRUD per record################
+
+@app.route('/sc/veto/<int:row_num>')
+def preview_veto(row_num):
+    table_txt = get_table_info('en', "SC", "Vetoes")
+    table_records = preview_sc_veto_record(row_num)
+    return render_template('/sc/preview_veto.html', table_txt=table_txt, records=table_records)
