@@ -19,7 +19,23 @@
             <td colspan="{{ text['column_span']}}">{{ text['links_txt']}}</td>
         </tr>
         
-        <tr></tr>
+        {% for record in records %}
+        <tr>
+            <td><a href="https://undocs.org/{{ lang }}/{{ record['res_url'] }}">{{ record['res_doc'] }}</a></td>
+            <td>{{ record['plen_ctte'] }}</td>
+            <td>{{ record['agenda'] }}</td>
+            <td>
+                <ul class="no-bullets">
+                    <li><a href="https://undocs.org/{{ lang }}/{{ record['meet_url'] }}">{{ record['meet_doc'] }}</a></li>
+                    <li>{{ record['date'] }}</li>
+                    <li><a href="https://www.un.org/press/en/{{ record['press_yr'] }}/{{ record['press_url'] }}.doc.htm">{{ record['press_release'] }}</a></li>
+                    <li>{{ record['vote'] }}</li>
+                </ul>
+            </td>
+            <td>{{ record['draft'] }}</td>
+            <td>{{ record['topic'] }}</td>
+        </tr>
+        {% endfor %}
     </table>
    
     {% endfor %}

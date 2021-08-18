@@ -1,0 +1,48 @@
+<html>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/ga-table.css') }}">
+
+
+    <table class="tablefont" >
+
+        {% for text in table_txt %}
+        <tr>
+            <th>Language</th>
+            {% for column in text['column_headers'] %}
+            <th>{{ column }}</th>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+        
+        {% for record in records %}
+        <tr>
+            <td>{{ record['lang'] }}</td>
+            <td>{{ record['date'] }}</td>
+            <td>
+                <ul class="no-bullets">
+                    {% for d in record['draft'] %}
+                    <li><a href="https://undocs.org/{{ record['lang'] }}/{{ d['url_suffix'] }}">{{ d['docsymbol'] }}</a></li>
+                    {% endfor %}
+                </ul>
+            </td>
+            <td>
+                <ul class="no-bullets">
+                    {% for w in record['written_record'] %}
+                    <li><a href="https://undocs.org/{{ record['lang'] }}/{{ w['url_suffix'] }}">{{ w['docsymbol'] }}</a></li>
+                    {% endfor %}
+                </ul>
+            </td>
+            <td>{{ record['agenda_item'] }}</td>
+            <td>
+                <ul class="no-bullets">
+                    {% for pm in record['pm_negative_vote'] %}
+                    <li>{{ pm }}</li>
+                    {% endfor %}
+                </ul>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+   
+
+    
+</html>

@@ -1,28 +1,25 @@
 table
 {
+width:99%;
+border-color: #C1C5CE;
+border-style: solid;
+border-width: 1px;
 border-collapse: collapse;
 border-spacing: 0px;
 font-size: 13px;
 font-family: Arial,Helvetica,sans-serif;
+
 }
 
-
 th
-
-{
+{font-size: 105%;
 text-align: center;}
 
 th,td
 {
-border-color: #666;
-border-style: solid;
+border-color: #C1C5CE;
+border-style: dotted;
 border-width: 1px;
 vertical-align: top;
 padding: 0.5em;
-}
-
-ul.no-bullets {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
 }

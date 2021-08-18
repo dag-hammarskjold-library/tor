@@ -54,6 +54,9 @@ def get_table_info(lang, body, template):
     transform['sequence'] = '$sequence.' + lang
     transform['links_txt'] = '$links_txt.' + lang
     transform['column_headers'] = '$column_headers.' + lang
+    transform['table_title'] = '$table_title.' + lang
+    transform['table_note'] = '$table_note.' + lang
+    transform['sequence'] = '$sequence.' + lang
 
     transform_stage = {}
     transform_stage['$project'] = transform
@@ -64,6 +67,134 @@ def get_table_info(lang, body, template):
     try:
         #print(list(db.templates.aggregate(pipeline)))
         return list(db.templates.aggregate(pipeline))
+
+    except Exception as e:
+        return e
+
+def get_ga_regular(lang, session):
+    """ 
+    Get the GA Regular Session table info by language and session
+    """
+    pipeline = []
+
+    match_stage = {
+        '$match': {
+            'template': 'Regular Sessions', 
+            'session': str(session)
+        }
+    } 
+
+    transform = {}
+    transform['_id'] = 0
+
+    transform['res_doc'] = '$resolution.doc_symbol'
+    transform['res_url'] = '$resolution.url_suffix'
+    transform['plen_ctte'] = 1
+    transform['agenda'] = 1
+    transform['meet_doc'] = '$meeting.doc_symbol'
+    transform['meet_url'] = '$meeting.url_suffix'
+    transform['date'] = '$date.' + lang 
+    
+
+    if lang == 'es':
+        press_lang = 'en'
+    else:
+        press_lang = lang
+
+    transform['press_yr'] = '$press.year'
+    transform['press_release'] = '$press.release.' + press_lang 
+    transform['press_url'] =  {
+        '$let': {
+            'vars': {
+                'release': {'$split': ['$press.release.' + press_lang, '/']}}, 
+            'in': {
+                '$concat': [
+                    {'$toLower': {'$arrayElemAt': ['$$release', 0]}}, 
+                    {'$arrayElemAt': ['$$release', 1]}
+                ]
+            }
+        }
+    } 
+    transform['vote'] = '$vote.' + lang 
+    transform['draft'] = '$draft'
+    transform['topic'] = '$topic.' + lang
+
+    transform_stage = {}
+    transform_stage['$project'] = transform
+
+    pipeline.append(match_stage)
+    pipeline.append(transform_stage)
+
+    try:
+        return list(db.records.aggregate(pipeline))
+
+    except Exception as e:
+        return e
+
+def get_sc_veto(lang):
+    """ 
+    Get the SC Veto table info by language
+    """
+    pipeline = []
+
+    match_stage = {
+        '$match': {
+            'template': 'Vetoes', 
+        }
+    } 
+
+    transform = {}
+    transform['_id'] = 0
+
+    transform['date'] = '$date.' + lang 
+    transform['draft'] = 1
+    transform['written_record'] = 1 
+    transform['agenda_item'] = '$agenda_item.' + lang 
+    transform['pm_negative_vote'] = '$pm_negative_vote.' + lang 
+
+    transform_stage = {}
+    transform_stage['$project'] = transform
+
+    pipeline.append(match_stage)
+    pipeline.append(transform_stage)
+
+    try:
+        return list(db.records.aggregate(pipeline))
+
+    except Exception as e:
+        return e
+
+def preview_sc_veto_record(row_num):
+    """ 
+    Return 1 SC Veto record for all languages
+    """
+
+    try:
+       
+        row = db.records.find_one({'template': 'Vetoes', 'row_num': row_num} )
+
+        preview_records = []
+
+        if row == None:
+            return preview_records
+        else:
+
+            langs = ['en', 'fr', 'es']
+            preview = {}
+            
+
+            for lang in langs:
+                preview['lang'] = lang
+                preview['date'] = row['date'][lang]
+                preview['draft'] = row['draft']
+                preview['written_record'] = row['written_record'] 
+                preview['agenda_item'] = row['agenda_item'][lang]
+                preview['pm_negative_vote'] = row['pm_negative_vote'][lang] 
+
+                preview_records.append(preview)
+                preview = {}
+
+            return preview_records
 
     except Exception as e:
         return e
